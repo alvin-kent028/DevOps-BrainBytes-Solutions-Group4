@@ -6,10 +6,10 @@
 BrainBytes is an AI-powered tutoring platform designed to provide accessible academic assistance to Filipino students. This project implements the platform using modern DevOps practices and containerization.
 
 ## Team Members
-- [Alvin Kent Bigbig] - Team Lead - [email@mmdc.mcl.edu.ph]
-- [Franze Villarasa] - Backend Developer - [email@mmdc.mcl.edu.ph]
+- [Alvin Kent Bigbig] - Team Lead - [lr.akbigbig@mmdc.mcl.edu.ph]
+- [Franze Villarasa] - Backend Developer - [lr.fvillarasa@mmdc.mcl.edu.ph]
 - [Shaira nicole Mirasol] - Frontend Developer - [lr.snmirasol@mmdc.mcl.edu.ph]
-- [Jhon Kharl Victoriano ] - DevOps Engineer - [email@mmdc.mcl.edu.ph]
+- [Jhon Kharl Victoriano ] - DevOps Engineer - [lr.jkvictoriano@mmdc.mcl.edu.ph]
 
 ## Project Goals
 - Implement a containerized application with proper networking
