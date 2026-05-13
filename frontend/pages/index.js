@@ -1,11 +1,13 @@
 import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
+import SubjectFilter from '../src/components/SubjectFilter';
 
 export default function Home() {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(true);
   const [isTyping, setIsTyping] = useState(false);
+  const [activeSubject, setActiveSubject] = useState(null);
   const messageEndRef = useRef(null);
 
   // Fetch messages from the API
@@ -40,7 +42,10 @@ export default function Home() {
       setMessages(prev => [...prev, tempUserMsg]);
       
       // Send to backend and get AI response
-      const response = await axios.post('http://localhost:3000/api/messages', { text: userMsg });
+      const response = await axios.post('http://localhost:3000/api/messages', { 
+        text: userMsg,
+        subject: activeSubject 
+      });
       
       // Replace the temporary message with the actual one and add AI response
       setMessages(prev => {
@@ -76,6 +81,8 @@ export default function Home() {
   return (
     <div style={{ maxWidth: '800px', margin: '0 auto', padding: '20px', fontFamily: 'Nunito, sans-serif' }}>
       <h1 style={{ textAlign: 'center', color: '#333' }}>BrainBytes AI Tutor</h1>
+      
+      <SubjectFilter activeSubject={activeSubject} onSubjectChange={setActiveSubject} />
       
       <div 
         style={{ 

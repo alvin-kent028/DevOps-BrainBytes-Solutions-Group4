@@ -2,6 +2,9 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const aiService = require('./aiService');
+const userProfileRoutes = require('./routes/userProfileRoutes');
+const learningMaterialRoutes = require('./routes/learningMaterialRoutes');
+const activityLogRoutes = require('./routes/activityLogRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -93,6 +96,11 @@ app.post('/api/messages', async (req, res) => {
     res.status(400).json({ error: err.message });
   }
 });
+
+// Register new routes
+app.use('/api/profiles', userProfileRoutes);
+app.use('/api/materials', learningMaterialRoutes);
+app.use('/api/activity', activityLogRoutes);
 
 // Start the server
 app.listen(PORT, () => {
