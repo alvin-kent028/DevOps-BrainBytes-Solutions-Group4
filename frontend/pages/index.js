@@ -17,7 +17,7 @@ export default function Home() {
   // Fetch messages from the API
   const fetchMessages = async () => {
     try {
-      const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3000';
+      const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5000';
       const response = await axios.get(`${API_BASE}/api/messages`);
       setMessages(response.data);
       setLoading(false);
@@ -56,7 +56,7 @@ export default function Home() {
       setMessages(prev => [...prev, tempUserMsg]);
       
       // Send to backend and get AI response
-      const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3000';
+      const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5000';
       const response = await axios.post(`${API_BASE}/api/messages`, { 
         text: userMsg,
         subject: activeSubject 
