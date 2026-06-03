@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  backend:
+    build: ./backend
+    container_name: brainbytes-backend
+    environment:
+      - PORT=5000
+      - MONGO_URI=mongodb://mongo:27017/brainbytes
+    ports:
+      - "5000:5000"
+    depends_on:
+      - mongo
+
+  frontend:
+    build: ./frontend
+    container_name: brainbytes-frontend
+    environment:
+      - NEXT_PUBLIC_API_BASE_URL=http://backend:5000
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+
+  mongo:
+    image: mongo:6.0
+    container_name: brainbytes-mongo
+    restart: unless-stopped
+    volumes:
+      - mongo-data:/data/db
+
+volumes:
+  mongo-data:
