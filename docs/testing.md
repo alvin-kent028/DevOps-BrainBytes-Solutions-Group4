@@ -1,5 +1,13 @@
 # Testing Documentation
 
+## Screenshot Links
+
+Add your captured evidence here before submission:
+
+- Backend & Frontend test screenshot: https://drive.google.com/drive/folders/1abq3wNguP8k7tWo3dOXrcQr5Z24SPrmP?usp=drive_link 
+- GitHub Actions workflow screenshot: https://drive.google.com/drive/folders/14AU3VHofriBGxurz8_N-pQb-IWk1_Oow?usp=drive_link
+- ESLint screenshot: https://drive.google.com/drive/folders/1LgQJZU1CuJ98P7AYoTirHjT6RahUpqxT?usp=drive_link 
+
 ## Testing Strategy
 
 The project uses two layers of automated checks:
@@ -27,6 +35,7 @@ The backend suite focuses on deterministic logic in `aiHelpers` and request/resp
 - The original backend tests expected an `app` export and chat routes that were not present in the current server entry point.
 - The frontend tests referenced missing `Chat` and `ChatInput` components, so lightweight test-friendly components had to be added.
 - The repository did not include ESLint configuration or a GitHub Actions workflow, so both had to be added before the submission evidence could be collected.
+- The repo initially had no screenshot artifacts, so the submission guide now includes placeholders for you to link the captured evidence.
 
 ## Evidence To Capture For Submission
 
