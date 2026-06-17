@@ -108,8 +108,8 @@ function getResponsePrefix(questionType) {
  */
 function detectSubject(text) {
   const lower = text.toLowerCase();
-  if (/\b(math|algebra|calculus|geometry|equation|number|fraction|percentage|formula)\b/.test(lower)) return 'Math';
-  if (/\b(science|physics|chemistry|biology|atom|molecule|cell|energy|force|experiment)\b/.test(lower)) return 'Science';
+  if (/\b(math|algebra|calculus|geometry|equation|number|fraction|percentage|formula)\b/.test(lower) || /[0-9]+\s*[+\-*/=]\s*[0-9]+/.test(lower)) return 'Math';
+  if (/\b(science|physics|chemistry|biology|atom|molecule|cell|energy|force|experiment|evaporation|photosynthesis|gravity|water cycle)\b/.test(lower)) return 'Science';
   if (/\b(history|war|revolution|empire|ancient|century|historical|civilization)\b/.test(lower)) return 'History';
   if (/\b(english|grammar|verb|noun|sentence|essay|literature|poem|writing|reading)\b/.test(lower)) return 'English';
   if (/\b(code|coding|programming|function|variable|loop|array|python|javascript|algorithm|debug)\b/.test(lower)) return 'Programming';

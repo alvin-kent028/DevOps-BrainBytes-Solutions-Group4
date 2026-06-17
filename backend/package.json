@@ -4,15 +4,24 @@
   "description": "Backend API for BrainBytes",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "test": "jest",
+    "lint": "eslint . --ext .js"
   },
   "dependencies": {
-    "express": "^4.17.1",
-    "mongoose": "^5.13.7",
     "cors": "^2.8.5",
-    "node-fetch": "^2.6.7",
-    "mongodb-memory-server": "^8.12.0",
+    "dotenv": "^16.3.1",
+    "express": "^4.17.1",
     "jsonwebtoken": "^9.0.0",
-    "dotenv": "^16.3.1"
+    "mongodb-memory-server": "^8.12.0",
+    "mongoose": "^5.13.7",
+    "node-fetch": "^2.6.7"
+  },
+  "devDependencies": {
+    "@babel/preset-env": "^8.0.0",
+    "babel-jest": "^30.4.1",
+    "eslint": "^10.5.0",
+    "jest": "^30.4.2",
+    "supertest": "^7.2.2"
   }
 }

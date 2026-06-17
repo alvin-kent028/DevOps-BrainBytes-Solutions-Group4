@@ -15,7 +15,6 @@ const trainingData = [
   { input: "What is an atom?", output: "An atom is the smallest unit of matter that retains the properties of an element. It has a nucleus (containing protons and neutrons) surrounded by electrons orbiting in shells. Everything around us is made of atoms!", type: "definition", subject: "Science" },
   { input: "Give me an example of a chemical reaction", output: "A great example is burning wood. Wood (carbon-based) reacts with oxygen in the air to produce carbon dioxide, water vapor, and heat energy. Another example: baking soda + vinegar → bubbles of CO₂ gas!", type: "example", subject: "Science" },
   { input: "What is the difference between a cell and an atom?", output: "An atom is the smallest unit of matter (like a single Lego brick). A cell is the smallest unit of life, made up of billions of atoms. Cells contain water, proteins, DNA, and more. Atoms are to cells what bricks are to a house.", type: "explanation", subject: "Science" },
-
   { input: "What are the states of matter?", output: "There are four main states of matter: Solid (fixed shape and volume, e.g., ice), Liquid (fixed volume but takes shape of container, e.g., water), Gas (no fixed shape or volume, e.g., steam), and Plasma (high-energy ionized gas, e.g., the sun).", type: "definition", subject: "Science" },
 
   // ===== PROGRAMMING =====
@@ -34,6 +33,7 @@ const trainingData = [
   { input: "What caused World War 1?", output: "WWI was caused by several factors, often remembered as MAIN: Militarism (arms race between nations), Alliances (tangled treaty obligations), Imperialism (competition over colonies), and Nationalism (rising pride and tensions). The spark was the assassination of Archduke Franz Ferdinand in 1914.", type: "explanation", subject: "History" },
   { input: "What was the Industrial Revolution?", output: "The Industrial Revolution (roughly 1760–1840) was a period of major change when manufacturing shifted from hand production to machine-based factory work. It began in Britain and spread worldwide. Key inventions included the steam engine and power loom, transforming economies and cities.", type: "definition", subject: "History" },
 
+  // ===== MATH =====
   { input: "What is a prime number?", output: "A prime number is a number greater than 1 that has no divisors other than 1 and itself. Examples: 2, 3, 5, 7, 11, 13. The number 2 is the only even prime number. Non-prime numbers are called composite numbers.", type: "definition", subject: "Math" },
   { input: "How do you multiply fractions?", output: "To multiply fractions: (1) Multiply the numerators together. (2) Multiply the denominators together. (3) Simplify if needed. Example: 2/3 × 3/4 = (2×3)/(3×4) = 6/12 = 1/2. No need to find a common denominator!", type: "explanation", subject: "Math" },
   { input: "What is the order of operations?", output: "Order of operations tells you which calculations to do first. Remember PEMDAS: Parentheses, Exponents, Multiplication & Division (left to right), Addition & Subtraction (left to right). Example: 2 + 3 × 4 = 2 + 12 = 14 (not 20).", type: "definition", subject: "Math" },
@@ -104,11 +104,12 @@ const trainingData = [
   { input: "What is a volcano?", output: "A volcano is an opening in Earth's crust where molten rock (magma), gases, and ash can escape. When magma exits a volcano, it's called lava. Volcanoes can form mountains and islands. Examples: Mount Mayon in the Philippines, Mount Fuji in Japan.", type: "definition", subject: "Geography" },
   { input: "What is the difference between weather and climate?", output: "Weather is the short-term atmospheric conditions in a specific place — like today's rain or sunshine. Climate is the long-term average weather pattern of a region over 30+ years. Example: Manila has hot and rainy weather today, but a tropical climate overall.", type: "explanation", subject: "Geography" },
   { input: "What is latitude and longitude?", output: "Latitude measures how far north or south a location is from the equator (0°), ranging from −90° to 90°. Longitude measures how far east or west from the Prime Meridian (0°), ranging from −180° to 180°. Together, they form a coordinate system to locate any point on Earth.", type: "definition", subject: "Geography" },
- 
+  
   // ===== FILIPINO / ARALING PANLIPUNAN =====
   { input: "Ano ang Katipunan?", output: "Ang Katipunan (buong pangalan: Kataastaasang Kagalanggalangang Katipunan ng mga Anak ng Bayan) ay isang lihim na rebolusyonaryong samahan na itinatag ni Andres Bonifacio noong 1892. Layunin nito ang kalayaan ng Pilipinas mula sa pamamahala ng Espanya.", type: "definition", subject: "Filipino" },
   { input: "Sino si Emilio Aguinaldo?", output: "Si Emilio Aguinaldo (1869–1964) ang unang pangulo ng Pilipinas. Nanguna siya sa rebolusyon laban sa Espanya at nag-proklamasyon ng kalayaan ng Pilipinas noong Hunyo 12, 1898 sa Kawit, Cavite. Siya rin ay lumaban laban sa pananakop ng Amerika.", type: "definition", subject: "Filipino" },
   { input: "Ano ang Noli Me Tangere?", output: "Ang Noli Me Tangere ay isang nobelang isinulat ni Dr. Jose Rizal noong 1887. Inilalarawan nito ang mga pang-aabuso ng mga prayle at ng kolonyal na pamahalaan ng Espanya sa Pilipinas. Ang nobela ay nagbigay-inspirasyon sa mga Pilipino na lumaban para sa kalayaan.", type: "definition", subject: "Filipino" },
-];
+
+  ];
 
 module.exports = trainingData;
