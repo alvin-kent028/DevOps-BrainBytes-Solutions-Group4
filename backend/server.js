@@ -68,6 +68,10 @@ connectWithFallback();
 
 
 // Start the server
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+const server = app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
+process.on('SIGTERM', () => {
+  server.close(() => {
+    console.log('Process terminated');
+  });
 });

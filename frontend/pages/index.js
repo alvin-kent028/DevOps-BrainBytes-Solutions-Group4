@@ -13,21 +13,41 @@ export default function Home() {
   const [activeSubject, setActiveSubject] = useState(null);
   const messageEndRef = useRef(null);
   const [expandedIds, setExpandedIds] = useState(new Set());
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  // Fetch messages from the API
+  // Check auth status on mount before fetching data
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      window.location.href = '/login';
+    } else {
+      setIsAuthenticated(true);
+      fetchMessages();
+    }
+  }, []);
+
+  // Fetch messages from the API with Authorization header
   const fetchMessages = async () => {
     try {
+      const token = localStorage.getItem('token');
       const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5000';
-      const response = await axios.get(`${API_BASE}/api/messages`);
+      
+      const response = await axios.get(`${API_BASE}/api/messages`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
       setMessages(response.data);
       setLoading(false);
     } catch (error) {
       console.error('Error fetching messages:', error);
+      if (error.response?.status === 401 || error.response?.status === 403) {
+        localStorage.removeItem('token');
+        window.location.href = '/login';
+      }
       setLoading(false);
     }
   };
 
-  // Submit a new message
+  // Submit a new message with Authorization header
   const handleSubmit = async (e) => {
     e.preventDefault();
     const trimmed = newMessage.trim();
@@ -42,11 +62,10 @@ export default function Home() {
     setErrorMsg('');
     
     try {
-      setIsTyping(true); // Show typing indicator
+      setIsTyping(true);
       const userMsg = newMessage;
       setNewMessage('');
       
-      // Optimistically add user message to UI
       const tempUserMsg = {
         _id: Date.now().toString(),
         text: userMsg,
@@ -55,23 +74,27 @@ export default function Home() {
       };
       setMessages(prev => [...prev, tempUserMsg]);
       
-      // Send to backend and get AI response
+      const token = localStorage.getItem('token');
       const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5000';
+      
       const response = await axios.post(`${API_BASE}/api/messages`, { 
         text: userMsg,
         subject: activeSubject 
+      }, {
+        headers: { 'Authorization': `Bearer ${token}` }
       });
       
-      // Replace the temporary message with the actual one and add AI response
       setMessages(prev => {
-        // Filter out the temporary message
         const filteredMessages = prev.filter(msg => msg._id !== tempUserMsg._id);
-        // Add the real messages from the API
         return [...filteredMessages, response.data.userMessage, response.data.aiMessage];
       });
     } catch (error) {
       console.error('Error posting message:', error);
-      // Show error in chat and show inline error
+      if (error.response?.status === 401 || error.response?.status === 403) {
+        localStorage.removeItem('token');
+        window.location.href = '/login';
+        return;
+      }
       const msg = error?.response?.data?.error || "Sorry, I couldn't process your request. Please try again later.";
       setErrorMsg(msg);
       setMessages(prev => [...prev, {
@@ -90,14 +113,28 @@ export default function Home() {
     messageEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  // Load messages on component mount
-  useEffect(() => {
-    fetchMessages();
-  }, []);
+  if (!isAuthenticated) {
+    return (
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#f8fafc', fontFamily: 'Nunito, sans-serif' }}>
+        <p style={{ color: '#475569', fontWeight: 600 }}>Verifying connection secure...</p>
+      </div>
+    );
+  }
 
   return (
     <div style={{ maxWidth: '800px', margin: '0 auto', padding: '20px', fontFamily: 'Nunito, sans-serif' }}>
-      <h1 style={{ textAlign: 'center', color: '#333' }}>BrainBytes AI Tutor</h1>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <h1 style={{ color: '#333', margin: 0 }}>BrainBytes AI Tutor</h1>
+        <button 
+          onClick={() => {
+            localStorage.removeItem('token');
+            window.location.href = '/login';
+          }}
+          style={{ background: 'none', border: '1px solid #cbd5e1', padding: '6px 12px', borderRadius: '8px', cursor: 'pointer', fontSize: '14px', color: '#64748b' }}
+        >
+          Logout
+        </button>
+      </div>
       
       <SubjectFilter activeSubject={activeSubject} onSubjectChange={setActiveSubject} />
       
