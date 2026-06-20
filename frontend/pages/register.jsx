@@ -55,69 +55,216 @@ export default function Register() {
   };
 
   return (
-    <div className="bg-slate-50 flex items-center justify-center min-h-screen p-4" style={{ fontFamily: 'Nunito, sans-serif' }}>
-      <div className="bg-white p-8 rounded-2xl shadow-lg w-full max-w-md border border-gray-100">
-        <header className="text-center mb-6">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Create Account 🎓</h1>
-          <p className="text-gray-600">Join BrainBytes and start your learning journey.</p>
-        </header>
+    <div style={styles.loginContainer}>
+      
+      {/* LEFT SIDE: INLINE REGISTER FORM */}
+      <div style={styles.loginFormSection}>
+        <div style={{ marginBottom: '2rem' }}>
+          <div style={styles.brandName}>BrainBytes.</div>
+        </div>
 
-        {error && <div className="p-3 text-sm rounded-lg mb-4 bg-red-100 text-red-700 border border-red-400">{error}</div>}
-        {success && <div className="p-3 text-sm rounded-lg mb-4 bg-green-100 text-green-700 border border-green-400">{success}</div>}
+        <div>
+          <h1 style={styles.welcomeHeading}>Create Account</h1>
+          <p style={styles.subText}>Join BrainBytes and start your learning journey today.</p>
+        </div>
 
-        <form onSubmit={handleRegister} className="space-y-5">
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">Username</label>
+        {error && <div style={styles.errorAlert}>⚠️ {error}</div>}
+        {success && <div style={styles.successAlert}>🎉 {success}</div>}
+
+        <form onSubmit={handleRegister} style={{ marginTop: '1.5rem' }}>
+          <div style={styles.formGroup}>
+            <label style={styles.label} htmlFor="username">Username</label>
             <input
+              id="username"
               type="text"
+              placeholder="Your username"
+              style={styles.inputField}
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              placeholder="Your username"
-              className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none transition"
               disabled={loading}
+              required
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">Email Address</label>
+          <div style={styles.formGroup}>
+            <label style={styles.label} htmlFor="email">Email Address</label>
             <input
+              id="email"
               type="email"
+              placeholder="you@example.com"
+              style={styles.inputField}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="you@example.com"
-              className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none transition"
               disabled={loading}
+              required
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">Password</label>
+          <div style={styles.formGroup}>
+            <label style={styles.label} htmlFor="password">Password</label>
             <input
+              id="password"
               type="password"
+              placeholder="••••••••"
+              style={styles.inputField}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
-              className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none transition"
               disabled={loading}
+              required
             />
           </div>
 
-          <button
-            type="submit"
-            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-lg transition duration-200"
-            disabled={loading}
-          >
+          <button type="submit" style={styles.submitBtn} disabled={loading}>
             {loading ? 'Creating Account...' : 'Sign Up'}
           </button>
         </form>
 
-        <p className="text-center text-gray-600 mt-6">
+        <p style={styles.signupPrompt}>
           Already have an account?{' '}
-          <a href="/login" className="text-indigo-600 font-semibold hover:underline">
-            Log In
-          </a>
+          <a href="/login" style={styles.signupLink}>Log In</a>
         </p>
       </div>
+
+      {/* RIGHT SIDE: CONTINUOUS DEEP DARK PANEL */}
+      <div style={styles.loginImageSection}>
+        <div style={styles.graphicCard}>
+          <h2 style={styles.graphicHeading}>Expand your mind, byte by byte.</h2>
+          <p style={styles.graphicDesc}>
+            Access high-yield DevOps training tracking systems, build cloud architectures seamlessly, and monitor automation clusters with your tech squad instantly.
+          </p>
+        </div>
+      </div>
+
     </div>
   );
 }
+
+// INLINE STYLES FOR ZERO-DEPENDENCY RENDERING
+const styles = {
+  loginContainer: {
+    display: 'flex',
+    minHeight: '100vh',
+    fontFamily: 'system-ui, -apple-system, sans-serif',
+    backgroundColor: '#ffffff',
+    margin: 0,
+    padding: 0,
+  },
+  loginFormSection: {
+    flex: 1,
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    padding: '3rem 4rem',
+    maxWidth: '500px',
+    width: '100%',
+  },
+  brandName: {
+    fontSize: '1.5rem',
+    fontWeight: '700',
+    color: '#4f46e5',
+    letterSpacing: '-0.05em',
+  },
+  welcomeHeading: {
+    fontSize: '2.25rem',
+    fontWeight: '800',
+    color: '#111827',
+    marginBottom: '0.5rem',
+    letterSpacing: '-0.03em',
+  },
+  subText: {
+    color: '#6b7280',
+    fontSize: '0.95rem',
+  },
+  errorAlert: {
+    backgroundColor: '#fef2f2',
+    borderLeft: '4px solid #ef4444',
+    padding: '1rem',
+    borderRadius: '6px',
+    color: '#991b1b',
+    fontSize: '0.875rem',
+    marginTop: '1rem',
+    fontWeight: '500',
+  },
+  successAlert: {
+    backgroundColor: '#f0fdf4',
+    borderLeft: '4px solid #22c55e',
+    padding: '1rem',
+    borderRadius: '6px',
+    color: '#166534',
+    fontSize: '0.875rem',
+    marginTop: '1rem',
+    fontWeight: '500',
+  },
+  formGroup: {
+    marginBottom: '1.25rem',
+  },
+  label: {
+    display: 'block',
+    fontSize: '0.875rem',
+    fontWeight: '600',
+    color: '#374151',
+    marginBottom: '0.5rem',
+  },
+  inputField: {
+    width: '100%',
+    padding: '0.75rem 1rem',
+    border: '1px solid #d1d5db',
+    borderRadius: '8px',
+    fontSize: '0.95rem',
+    color: '#111827',
+    boxSizing: 'border-box',
+    outline: 'none',
+  },
+  submitBtn: {
+    width: '100%',
+    padding: '0.85rem',
+    backgroundColor: '#4f46e5',
+    color: 'white',
+    border: 'none',
+    borderRadius: '8px',
+    fontSize: '1rem',
+    fontWeight: '600',
+    cursor: 'pointer',
+    marginTop: '1rem',
+    boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+  },
+  signupPrompt: {
+    textAlign: 'center',
+    fontSize: '0.9rem',
+    color: '#6b7280',
+    marginTop: '1.5rem',
+  },
+  signupLink: {
+    color: '#4f46e5',
+    textDecoration: 'none',
+    fontWeight: '600',
+  },
+  loginImageSection: {
+    flex: 1.2,
+    backgroundColor: '#111827',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: '4rem',
+  },
+  graphicCard: {
+    background: 'rgba(255, 255, 255, 0.03)',
+    border: '1px solid rgba(255, 255, 255, 0.08)',
+    padding: '3rem',
+    borderRadius: '24px',
+    maxWidth: '500px',
+    color: 'white',
+  },
+  graphicHeading: {
+    fontSize: '2.5rem',
+    fontWeight: '800',
+    lineHeight: '1.2',
+    marginBottom: '1.5rem',
+    color: '#ffffff',
+  },
+  graphicDesc: {
+    color: '#9ca3af',
+    lineHeight: '1.6',
+    fontSize: '1.05rem',
+  },
+};
