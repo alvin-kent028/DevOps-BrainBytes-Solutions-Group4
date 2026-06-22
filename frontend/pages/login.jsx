@@ -64,8 +64,8 @@ export default function Login() {
         </div>
 
         <div>
-          <h1 style={styles.welcomeHeading}>Welcome back</h1>
-          <p style={styles.subText}>Welcome back! Please enter your details to access your account.</p>
+          <h1 style={styles.welcomeHeading}>Your Future Starts Here!🚀</h1>
+          <p style={styles.subText}>Create your BrainBytes account and take the first step toward achieving your academic goals. Learn at your own pace and reach your full potential.</p>
         </div>
 
         {error && (
@@ -94,7 +94,7 @@ export default function Login() {
             <input
               id="password"
               type="password"
-              placeholder="••••••••"
+              placeholder="••••••"
               style={styles.inputField}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
