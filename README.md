@@ -98,6 +98,7 @@ npm run lint
 - Backend & Frontend test screenshot: https://drive.google.com/drive/folders/1abq3wNguP8k7tWo3dOXrcQr5Z24SPrmP?usp=drive_link 
 - GitHub Actions workflow screenshot: https://drive.google.com/drive/folders/14AU3VHofriBGxurz8_N-pQb-IWk1_Oow?usp=drive_link
 - ESLint screenshot: https://drive.google.com/drive/folders/1LgQJZU1CuJ98P7AYoTirHjT6RahUpqxT?usp=drive_link 
+- Milestone 2 Documentation: https://docs.google.com/document/d/1oBvvJXoTO55fvKLpmZnq5CQpkDMhVTTtFpnU2_W8JoQ/edit?usp=sharing 
 
 ## Resources
 
