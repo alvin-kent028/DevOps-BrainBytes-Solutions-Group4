@@ -20,6 +20,10 @@ const userProfileSchema = new mongoose.Schema(
       default: [],
       enum: ['Math', 'Science', 'English', 'History', 'Programming', 'General'],
     },
+    password: {
+      type: String,
+      required: true,
+    },
     avatar: {
       type: String,
       default: '',
