@@ -1,19 +1,33 @@
-name: CI
+name: CI/CD Pipeline
 
 on:
   push:
+    branches: [ main, master ]
   pull_request:
+    branches: [ main, master ]
 
 jobs:
+  # ==========================================
+  # BACKEND PIPELINE
+  # ==========================================
   backend:
-    name: Backend Tests and Lint
+    name: Backend CI/CD
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: backend
+    
+    services:
+      mongodb:
+        image: mongo:6.0
+        ports:
+          - 27017:27017
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -23,16 +37,46 @@ jobs:
           cache-dependency-path: backend/package-lock.json
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci 
 
-      - name: Run backend tests
-        run: npm test -- --passWithNoTests
-
+      # Basic code quality check
       - name: Run backend lint
         run: npm run lint
 
+      # Dependency Scanning
+      - name: Backend Security Audit (npm audit)
+        run: npm audit --audit-level=high
+
+      # FIX 1: Corrected Trufflehog Secret Scan configurations for monorepos
+      - name: Backend Secret Scanning (Trufflehog)
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./backend
+          extra_args: --only-verified
+
+      # Integration & unit tests
+      - name: Run backend integration & unit tests
+        run: npm test
+        env:
+          MONGO_URI: mongodb://localhost:27017/test_db
+          PORT: 5000
+
+      # Automated Docker Build Check
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Test Build Backend Docker Image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend
+          file: ./backend/Dockerfile
+          push: false 
+
+  # ==========================================
+  # FRONTEND PIPELINE
+  # ==========================================
   frontend:
-    name: Frontend Tests and Lint
+    name: Frontend CI
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -40,6 +84,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -49,10 +95,55 @@ jobs:
           cache-dependency-path: frontend/package-lock.json
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
-      - name: Run frontend tests
-        run: npm test -- --passWithNoTests
-
+      # Basic code quality check
       - name: Run frontend lint
         run: npm run lint
+
+      # Dependency Scanning
+      - name: Frontend Security Audit (npm audit)
+        run: npm audit --audit-level=high
+
+      # Run tests
+      - name: Run frontend tests
+        run: npm test
+
+      # Automated Docker Build Check
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Test Build Frontend Docker Image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./frontend
+          file: ./frontend/Dockerfile
+          push: false
+
+  # ==========================================
+  # AUTOMATED DEPLOYMENT
+  # ==========================================
+  deploy:
+    name: Continuous Deployment
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    needs: [backend, frontend] 
+    runs-on: ubuntu-latest
+    env:
+        RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Cloud Deployment CLI
+        run: npm install -g @railway/cli
+
+      # Deploy Backend Service to Cloud
+      - name: Deploy Backend Service to Cloud
+        run: railway up --detach --service "brainbytes-backend"
+        working-directory: ./backend
+
+      # Deploy Frontend Service to Cloud
+      - name: Deploy Frontend Service to Cloud
+        run: railway up --detach --service "brainbytes-frontend"
+        working-directory: ./frontend
