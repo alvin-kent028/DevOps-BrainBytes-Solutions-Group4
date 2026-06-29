@@ -64,8 +64,8 @@ export default function Login() {
         </div>
 
         <div>
-          <h1 style={styles.welcomeHeading}>Welcome back</h1>
-          <p style={styles.subText}>Welcome back! Please enter your details to access your account.</p>
+          <h1 style={styles.welcomeHeading}>Welcome to BrainBytes!</h1>
+          <p style={styles.subText}>Empowering smarter learning, one byte at a time. Please sign in to continue your journey.</p>
         </div>
 
         {error && (
