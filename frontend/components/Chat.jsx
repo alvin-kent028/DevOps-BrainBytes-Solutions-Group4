@@ -23,8 +23,10 @@ export default function Chat() {
     setLoading(true);
     setError('');
 
-    // Optimistically put the user's message on screen instantly
-    const tempUserMsg = { text, isUser: true, category: 'general', createdAt: new Date() };
+    // FIX: Set the temporary message category dynamically matching the current tab
+    // This prevents the user's message from hiding under specific filters instantly.
+    const currentCategory = activeTab === 'All' ? 'general' : activeTab.toLowerCase();
+    const tempUserMsg = { text, isUser: true, category: currentCategory, createdAt: new Date() };
     setMessages(prev => [...prev, tempUserMsg]);
 
     try {

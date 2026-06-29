@@ -16,11 +16,8 @@ const { MongoMemoryServer } = require('mongodb-memory-server');
 
 async function connectWithFallback() {
   try {
-    await mongoose.connect(primaryMongo, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-      retryWrites: true
-    });
+    // FIXED: Removed deprecated useNewUrlParser and useUnifiedTopology options
+    await mongoose.connect(primaryMongo);
     console.log('Connected to MongoDB:', primaryMongo);
   } catch (errPrimary) {
     console.warn('Primary MongoDB connection failed:', errPrimary.message);
@@ -31,16 +28,12 @@ async function connectWithFallback() {
     }
 
     try {
-      await mongoose.connect(fallbackMongo, {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-        retryWrites: true
-      });
+      // FIXED: Removed deprecated options
+      await mongoose.connect(fallbackMongo);
       console.log('Connected to MongoDB (fallback):', fallbackMongo);
     } catch (errFallback) {
       console.error('Failed to connect to MongoDB (both primary and fallback):', errFallback.message || errFallback);
 
-      // CRITICAL FIX: Prevent ephemeral in-memory databases from running on your live production server
       if (process.env.NODE_ENV === 'production') {
         console.error('CRITICAL: Database connection failed in production mode. Refusing to start ephemeral fallback.');
         process.exit(1);
@@ -51,11 +44,8 @@ async function connectWithFallback() {
         const mongod = await MongoMemoryServer.create();
         const inMemoryUri = mongod.getUri();
         global.__MONGOD__ = mongod;
-        await mongoose.connect(inMemoryUri, {
-          useNewUrlParser: true,
-          useUnifiedTopology: true,
-          retryWrites: true
-        });
+        // FIXED: Removed deprecated options
+        await mongoose.connect(inMemoryUri);
         console.log('Connected to in-memory MongoDB');
       } catch (errMem) {
         console.error('Failed to start in-memory MongoDB:', errMem);

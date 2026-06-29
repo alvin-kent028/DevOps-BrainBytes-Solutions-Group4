@@ -51,24 +51,33 @@ const initializeAI = () => {
 async function generateResponse(question, options = {}) {
   const lowerQuestion = question.toLowerCase();
   
+  // 1. Keyword detection rules
   const isMath = lowerQuestion.includes('calculate') || 
                  lowerQuestion.includes('math') ||
-                 lowerQuestion.includes('1+1') ||
-                 /[+\-*\/=]/.test(lowerQuestion) ||
-                 /\d+/.test(lowerQuestion);
+                 lowerQuestion.includes('fraction') ||
+                 lowerQuestion.includes('algebra') ||
+                 lowerQuestion.includes('geometry') ||
+                 lowerQuestion.includes('equation') ||
+                 /[+\-*\/=]/.test(lowerQuestion);
   
   const isHistory = lowerQuestion.includes('history') ||
                     lowerQuestion.includes('capital') ||
                     lowerQuestion.includes('philippines') ||
                     lowerQuestion.includes('president') ||
-                    lowerQuestion.includes('war');
+                    lowerQuestion.includes('war') ||
+                    lowerQuestion.includes('revolution') ||
+                    lowerQuestion.includes('rizal') ||
+                    lowerQuestion.includes('katipunan') ||
+                    lowerQuestion.includes('aguinaldo');
 
   const isScience = lowerQuestion.includes('science') ||
                     lowerQuestion.includes('evaporation') ||
                     lowerQuestion.includes('precipitation') ||
                     lowerQuestion.includes('water') ||
                     lowerQuestion.includes('chemical') ||
-                    lowerQuestion.includes('biology');
+                    lowerQuestion.includes('biology') ||
+                    lowerQuestion.includes('atom') ||
+                    lowerQuestion.includes('photosynthesis');
 
   const isProgramming = lowerQuestion.includes('javascript') ||
                         lowerQuestion.includes('python') ||
@@ -76,23 +85,26 @@ async function generateResponse(question, options = {}) {
                         lowerQuestion.includes('programming') ||
                         lowerQuestion.includes('html') ||
                         lowerQuestion.includes('css') ||
-                        lowerQuestion.includes('software');
+                        lowerQuestion.includes('array') ||
+                        lowerQuestion.includes('loop');
 
-  let category = 'general';
-  if (isMath) category = 'math';
-  if (isHistory) category = 'history';
-  if (isScience) category = 'science';
-  if (isProgramming) category = 'programming';
+  const isEnglish = lowerQuestion.includes('english') ||
+                    lowerQuestion.includes('noun') ||
+                    lowerQuestion.includes('verb') ||
+                    lowerQuestion.includes('adjective') ||
+                    lowerQuestion.includes('adverb') ||
+                    lowerQuestion.includes('simile') ||
+                    lowerQuestion.includes('metaphor');
 
-  if (options.subject) {
-    const s = options.subject.toString().toLowerCase();
-    if (s === 'math') category = 'math';
-    if (s === 'science') category = 'science';
-    if (s === 'history') category = 'history';
-    if (s === 'programming' || s === 'code') category = 'programming';
-    if (s === 'english') category = 'english';
-  }
+  // 2. Resolve the true detected category
+  let detectedCategory = 'general';
+  if (isMath) detectedCategory = 'math';
+  else if (isHistory) detectedCategory = 'history';
+  else if (isScience) detectedCategory = 'science';
+  else if (isProgramming) detectedCategory = 'programming';
+  else if (isEnglish) detectedCategory = 'english';
 
+  // 3. Refine detected category using exact or loose training data rules
   const findTrainingMatch = (q) => {
     const norm = (s) => String(s || '').toLowerCase().trim();
     for (const item of trainingData) {
@@ -107,10 +119,42 @@ async function generateResponse(question, options = {}) {
   };
 
   const tdMatch = findTrainingMatch(question);
+  if (tdMatch && tdMatch.subject) {
+    detectedCategory = tdMatch.subject.toLowerCase();
+  }
+
+  // FIX: Subject Mismatch Verification Guardrail
+  if (options.subject) {
+    const requestedCategory = options.subject.toString().toLowerCase();
+
+    // If the user is inside a specific tab (not 'All'), check if it matches the detected category
+    if (requestedCategory !== 'general' && detectedCategory !== requestedCategory) {
+      const capitalizedTab = options.subject.charAt(0).toUpperCase() + options.subject.slice(1);
+      const capitalizedDetected = detectedCategory.charAt(0).toUpperCase() + detectedCategory.slice(1);
+      
+      let rejectionText = `It looks like you're asking a **${capitalizedDetected}** question, but you are currently inside the **${capitalizedTab}** tab.`;
+      if (detectedCategory === 'general') {
+        rejectionText = `It looks like this question is not related to **${capitalizedTab}**.`;
+      }
+
+      return {
+        // Keep category equal to requestedCategory so it displays inside the current active tab view
+        category: requestedCategory, 
+        response: `${rejectionText} Please select the **${detectedCategory === 'general' ? 'General' : capitalizedDetected}** or **All** tab to submit this question!`
+      };
+    }
+  }
+
+  // If validation passes, fallback or proceed down to the normal processing stream
+  let category = options.subject ? options.subject.toString().toLowerCase() : detectedCategory;
+  if (!['math', 'science', 'history', 'programming', 'english', 'general'].includes(category)) {
+    category = detectedCategory;
+  }
+
+  // Return hardcoded answer directly if training item matched earlier
   if (tdMatch) {
-    const mappedCategory = tdMatch.subject ? tdMatch.subject.toLowerCase() : category;
     return {
-      category: mappedCategory,
+      category: category,
       response: enhanceVocabulary(tdMatch.output)
     };
   }
@@ -213,6 +257,10 @@ function getDetailedResponse(category, question) {
   
   if (category === 'math') {
     return "Mathematics is built on patterns, logic, and precise problem-solving equations. Tell me what numbers or formulas you are struggling with, and we can solve it step-by-step!\n\nQuick summary: Solving structural numeric problems.";
+  }
+
+  if (category === 'english') {
+    return "English lessons help us study grammar mechanics, literature, and active writing choices. Share the sentences you are reviewing so we can break them down together!\n\nQuick summary: Investigating word choices and grammar structure.";
   }
   
   if (category === 'history') {

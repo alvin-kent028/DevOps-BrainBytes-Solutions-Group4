@@ -69,14 +69,15 @@ jobs:
           cache: npm
           cache-dependency-path: backend/package-lock.json
 
-      # FIXED: Added --legacy-peer-deps to ignore Babel 7 vs 8 paradox
       - name: Install dependencies
         run: npm install --legacy-peer-deps
 
       - name: Run backend lint
         run: npm run lint
 
-      # FIXED: Swapped 'high' for 'critical' so Babel version warnings don't fail the build
+      - name: Backend Dependency Security Audit
+        run: npm audit --audit-level=high --omit=dev
+
       - name: Backend Dependency Security Audit
         run: npm audit --audit-level=critical
 
@@ -117,14 +118,15 @@ jobs:
           cache: npm
           cache-dependency-path: frontend/package-lock.json
 
-      # FIXED: Added --legacy-peer-deps to ignore Babel 7 vs 8 paradox
       - name: Install dependencies
         run: npm install --legacy-peer-deps
 
       - name: Run frontend lint
         run: npm run lint
 
-      # FIXED: Swapped 'high' for 'critical' so Babel version warnings don't fail the build
+      - name: Frontend Dependency Security Audit
+        run: npm audit --audit-level=high --omit=dev
+
       - name: Frontend Dependency Security Audit
         run: npm audit --audit-level=critical
 
