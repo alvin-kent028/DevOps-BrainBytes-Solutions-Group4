@@ -9,10 +9,6 @@ const PORT = process.env.PORT || 5000;
 // Initialize AI model
 aiService.initializeAI();
 
-// Connect to MongoDB with a sensible fallback for local development.
-// Prefer an explicit MONGO_URI environment variable. When not provided
-// try the Docker service hostname first (mongo), then fall back to
-// localhost for systems running a local MongoDB instance.
 const primaryMongo = process.env.MONGO_URI || 'mongodb://mongo:27017/brainbytes';
 const fallbackMongo = 'mongodb://localhost:27017/brainbytes';
 
@@ -28,7 +24,7 @@ async function connectWithFallback() {
     console.log('Connected to MongoDB:', primaryMongo);
   } catch (errPrimary) {
     console.warn('Primary MongoDB connection failed:', errPrimary.message);
-    // If the primary was explicitly set via env, don't try fallback.
+    
     if (process.env.MONGO_URI) {
       console.error('Failed to connect to MongoDB (MONGO_URI).');
       return;
@@ -44,12 +40,16 @@ async function connectWithFallback() {
     } catch (errFallback) {
       console.error('Failed to connect to MongoDB (both primary and fallback):', errFallback.message || errFallback);
 
-      // As a last-resort for local development, start an in-memory MongoDB.
+      // CRITICAL FIX: Prevent ephemeral in-memory databases from running on your live production server
+      if (process.env.NODE_ENV === 'production') {
+        console.error('CRITICAL: Database connection failed in production mode. Refusing to start ephemeral fallback.');
+        process.exit(1);
+      }
+
       try {
         console.warn('Starting in-memory MongoDB for local development...');
         const mongod = await MongoMemoryServer.create();
         const inMemoryUri = mongod.getUri();
-        // Keep reference so it isn't GC'd and we can stop it if needed
         global.__MONGOD__ = mongod;
         await mongoose.connect(inMemoryUri, {
           useNewUrlParser: true,
@@ -66,8 +66,6 @@ async function connectWithFallback() {
 
 connectWithFallback();
 
-
-// Start the server
 const server = app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 
 process.on('SIGTERM', () => {
