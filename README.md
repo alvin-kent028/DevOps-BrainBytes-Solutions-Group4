@@ -72,10 +72,10 @@ Run the automated tests with:
 
 ```powershell
 cd backend
-npm test -- --passWithNoTests
+npm test
 
 cd ..\frontend
-npm test -- --passWithNoTests
+npm test
 ```
 
 Run lint checks with:
@@ -91,6 +91,25 @@ npm run lint
 ## Documentation
 
 - Testing documentation: [docs/testing.md](docs/testing.md)
+- Operations runbook (staging, monitoring, scaling, rollback): [docs/operations.md](docs/operations.md)
+
+## Required GitHub Secrets
+
+Set these under **Repo Settings → Secrets and variables → Actions** for the CI/CD
+pipeline in `.github/workflows/ci.yml` to work:
+
+| Secret | Used for |
+|---|---|
+| `RAILWAY_TOKEN` | Authenticating the Railway CLI in the `deploy` job |
+| `BACKEND_PUBLIC_URL` | Post-deploy health check (e.g. `https://brainbytes-backend.up.railway.app`) |
+
+## Health Check
+
+The backend exposes `GET /health`, returning `200` with `{ status: "ok" }` when
+connected to MongoDB, or `503` with `{ status: "degraded" }` if the database
+connection is down. This is used by Railway's `healthcheckPath` (see
+`railway.json`), the Docker `HEALTHCHECK` instruction, and CI's post-deploy
+verification step.
 
 ## Submission Evidence
 

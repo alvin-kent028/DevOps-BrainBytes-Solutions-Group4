@@ -34,6 +34,25 @@ app.get('/', (req, res) => {
   res.json({ message: 'Welcome to the BrainBytes API' });
 });
 
+// Health check endpoint used by Docker HEALTHCHECK, Railway healthcheckPath,
+// and the post-deploy verification step in ci.yml. Must stay lightweight
+// and must not depend on external services other than the DB connection state.
+app.get('/health', (req, res) => {
+  const dbState = mongoose.connection.readyState; // 1 = connected
+  const isDbConnected = dbState === 1;
+
+  const payload = {
+    status: isDbConnected ? 'ok' : 'degraded',
+    uptime: process.uptime(),
+    timestamp: new Date().toISOString(),
+    db: isDbConnected ? 'connected' : 'disconnected'
+  };
+
+  // 200 if DB is connected, 503 if not (so Railway/uptime monitors correctly
+  // treat a DB outage as an unhealthy deployment instead of a false "ok").
+  res.status(isDbConnected ? 200 : 503).json(payload);
+});
+
 app.get('/api/messages', async (req, res) => {
   try {
     if (mongoose.connection.readyState === 1) {

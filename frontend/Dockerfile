@@ -1,34 +1,44 @@
-# ## Start app locally: open [Start instructions](../README_START.md) in VS Code Markdown preview and click the launcher link
-# FROM node:14-alpine
-# WORKDIR /usr/src/app
-# COPY package*.json ./
-# RUN npm install
-# COPY . .
-# EXPOSE 3000
-# CMD ["npm", "run", "dev"]
-
-#TEST DEBUG
-
-FROM node:18-alpine
-
+# ---- Stage 1: install dependencies ----
+FROM node:20-alpine AS deps
 WORKDIR /app
-
-# Copy package files from the current folder (which is /frontend)
 COPY package*.json ./
+RUN npm ci --legacy-peer-deps
 
-# Install dependencies
-RUN npm install
-
-# Copy the rest of the frontend application files
+# ---- Stage 2: build the Next.js app ----
+FROM node:20-alpine AS builder
+WORKDIR /app
+COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# CRITICAL: Pull the Railway variable into the Docker build environment
+# Pull the Railway build-time variable into the build so it gets baked
+# into the client bundle (NEXT_PUBLIC_ vars must be present at build time).
 ARG NEXT_PUBLIC_API_BASE_URL
 ENV NEXT_PUBLIC_API_BASE_URL=$NEXT_PUBLIC_API_BASE_URL
+ENV NEXT_TELEMETRY_DISABLED=1
 
-# Build the Next.js production app with the variable baked in
 RUN npm run build
 
-EXPOSE 3000
+# ---- Stage 3: minimal runtime image ----
+FROM node:20-alpine AS runner
+WORKDIR /app
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
 
-CMD ["npm", "start"]
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+
+# Only copy the standalone output + static assets, not the full build tree
+# or devDependencies — this is what next.config.js's output:'standalone' enables.
+COPY --from=builder /app/public ./public
+COPY --from=builder --chown=appuser:appgroup /app/.next/standalone ./
+COPY --from=builder --chown=appuser:appgroup /app/.next/static ./.next/static
+
+USER appuser
+
+EXPOSE 3000
+ENV PORT=3000
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+  CMD wget -qO- "http://localhost:3000/" || exit 1
+
+# standalone output ships its own server.js entrypoint
+CMD ["node", "server.js"]
