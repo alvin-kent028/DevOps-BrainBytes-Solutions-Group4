@@ -9,6 +9,7 @@ FROM node:20-alpine AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
+RUN mkdir -p public
 
 # Pull the Railway build-time variable into the build so it gets baked
 # into the client bundle (NEXT_PUBLIC_ vars must be present at build time).
@@ -28,7 +29,6 @@ RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 
 # Only copy the standalone output + static assets, not the full build tree
 # or devDependencies — this is what next.config.js's output:'standalone' enables.
-COPY --from=builder /app/public ./public
 COPY --from=builder --chown=appuser:appgroup /app/.next/standalone ./
 COPY --from=builder --chown=appuser:appgroup /app/.next/static ./.next/static
 
