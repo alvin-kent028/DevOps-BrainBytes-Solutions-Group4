@@ -52,22 +52,6 @@ NEXT_PUBLIC_API_BASE_URL=http://localhost:5000
 
 ## Running the App
 
-### Backend
-
-```powershell
-cd backend
-npm start
-```
-
-### Frontend
-
-```powershell
-cd frontend
-npm run dev
-```
-
-## Testing
-
 BACKEND
 Open a terminal in backend
 
