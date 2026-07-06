@@ -1,0 +1,11 @@
+groups:
+  - name: brainbytes-recording-rules
+    rules:
+      - record: job:brainbytes_api_request_rate:sum
+        expr: sum(rate(brainbytes_api_request_total[5m])) by (job)
+
+      - record: job:brainbytes_api_error_rate:ratio
+        expr: sum(rate(brainbytes_api_request_errors_total[5m])) by (job) / sum(rate(brainbytes_api_request_total[5m])) by (job)
+
+      - record: job:brainbytes_backend_95th_latency_seconds
+        expr: histogram_quantile(0.95, sum(rate(brainbytes_api_request_duration_seconds_bucket[5m])) by (job, le))

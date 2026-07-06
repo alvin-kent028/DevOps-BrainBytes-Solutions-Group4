@@ -10,29 +10,29 @@ const PORT = process.env.PORT || 5000;
 aiService.initializeAI();
 
 const primaryMongo = process.env.MONGO_URI || 'mongodb://mongo:27017/brainbytes';
-const fallbackMongo = 'mongodb://localhost:27017/brainbytes';
+const localFallbackMongo = 'mongodb://127.0.0.1:27017/brainbytes';
+const usesDockerMongoHost = /^mongodb:\/\/mongo(:\d+)?\//.test(primaryMongo);
 
 const { MongoMemoryServer } = require('mongodb-memory-server');
 
 async function connectWithFallback() {
   try {
-    // FIXED: Removed deprecated useNewUrlParser and useUnifiedTopology options
     await mongoose.connect(primaryMongo);
     console.log('Connected to MongoDB:', primaryMongo);
   } catch (errPrimary) {
     console.warn('Primary MongoDB connection failed:', errPrimary.message);
-    
-    if (process.env.MONGO_URI) {
-      console.error('Failed to connect to MongoDB (MONGO_URI).');
+
+    if (process.env.NODE_ENV === 'production' && !usesDockerMongoHost) {
+      console.error('Failed to connect to MongoDB (MONGO_URI) in production. Exiting.');
       return;
     }
 
+    const fallbackTarget = usesDockerMongoHost ? localFallbackMongo : localFallbackMongo;
     try {
-      // FIXED: Removed deprecated options
-      await mongoose.connect(fallbackMongo);
-      console.log('Connected to MongoDB (fallback):', fallbackMongo);
+      await mongoose.connect(fallbackTarget);
+      console.log('Connected to MongoDB (fallback):', fallbackTarget);
     } catch (errFallback) {
-      console.error('Failed to connect to MongoDB (both primary and fallback):', errFallback.message || errFallback);
+      console.warn('Fallback MongoDB connection failed:', errFallback.message);
 
       if (process.env.NODE_ENV === 'production') {
         console.error('CRITICAL: Database connection failed in production mode. Refusing to start ephemeral fallback.');
@@ -44,7 +44,6 @@ async function connectWithFallback() {
         const mongod = await MongoMemoryServer.create();
         const inMemoryUri = mongod.getUri();
         global.__MONGOD__ = mongod;
-        // FIXED: Removed deprecated options
         await mongoose.connect(inMemoryUri);
         console.log('Connected to in-memory MongoDB');
       } catch (errMem) {

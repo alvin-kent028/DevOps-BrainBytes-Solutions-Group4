@@ -1,0 +1,42 @@
+groups:
+  - name: brainbytes-alerts
+    rules:
+      - alert: BackendHighErrorRate
+        expr: rate(brainbytes_api_request_errors_total[5m]) > 0.05
+        for: 5m
+        labels:
+          severity: critical
+          team: ops
+        annotations:
+          summary: "High backend error rate for BrainBytes"
+          description: "The backend error rate over the last 5 minutes exceeded 5%."
+
+      - alert: BackendLatencyWarning
+        expr: histogram_quantile(0.95, sum(rate(brainbytes_api_request_duration_seconds_bucket[5m])) by (le)) > 1.5
+        for: 10m
+        labels:
+          severity: warning
+          team: ops
+        annotations:
+          summary: "Backend response latency is elevated"
+          description: "95th percentile response time is above 1.5 seconds over the last 10 minutes."
+
+      - alert: HighMemoryUsage
+        expr: process_resident_memory_bytes{job="brainbytes-backend"} > 500 * 1024 * 1024
+        for: 5m
+        labels:
+          severity: warning
+          team: ops
+        annotations:
+          summary: "High memory usage on backend service"
+          description: "Backend memory usage is above 500MiB for more than 5 minutes." 
+
+      - alert: HighAIResponseTime
+        expr: histogram_quantile(0.90, sum(rate(brainbytes_ai_response_time_seconds_bucket[5m])) by (le)) > 2.0
+        for: 5m
+        labels:
+          severity: critical
+          team: ai
+        annotations:
+          summary: "High AI response latency"
+          description: "90th percentile AI response time has exceeded 2 seconds." 

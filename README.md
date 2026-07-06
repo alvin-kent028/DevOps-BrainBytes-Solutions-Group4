@@ -68,15 +68,33 @@ npm run dev
 
 ## Testing
 
-Run the automated tests with:
+BACKEND
+Open a terminal in backend
 
-```powershell
-cd backend
-npm test
+Install dependencies:
+npm install
 
-cd ..\frontend
-npm test
-```
+Create backend/.env if needed:
+"MONGO_URI=mongodb://localhost:27017/brainbytes
+PORT=5000
+HUGGINGFACE_TOKEN=your_token_here"
+
+Start backend:
+npm start
+
+
+FRONTEND
+Open a terminal in frontend
+
+Install dependencies:
+npm install
+
+Start frontend:
+npm run dev
+
+Open the UI at:
+http://localhost:3000
+
 
 Run lint checks with:
 

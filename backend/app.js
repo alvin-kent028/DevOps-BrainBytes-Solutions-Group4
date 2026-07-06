@@ -3,6 +3,7 @@ const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const aiService = require('./aiService');
+const metrics = require('./metrics');
 const userProfileRoutes = require('./routes/userProfileRoutes');
 const learningMaterialRoutes = require('./routes/learningMaterialRoutes');
 const activityLogRoutes = require('./routes/activityLogRoutes');
@@ -12,6 +13,7 @@ const app = express();
 
 app.use(cors());
 app.use(express.json());
+app.use(metrics.registerRequestMetrics);
 
 const messageSchema = new mongoose.Schema({
   text: String,
@@ -96,10 +98,15 @@ app.post('/api/messages', async (req, res) => {
 
     const aiResultPromise = aiService.generateResponse(safeText, { subject: req.body.subject, userId: req.body.userId });
 
+    const startedAt = process.hrtime();
     const aiResult = await Promise.race([aiResultPromise, timeoutPromise]).catch(() => ({
       category: 'error',
       response: "I'm sorry, but I couldn't process your request in time. Please try again with a simpler question."
     }));
+
+    const elapsed = process.hrtime(startedAt);
+    const elapsedSeconds = elapsed[0] + elapsed[1] / 1e9;
+    metrics.observeAIResponseTime(elapsedSeconds);
 
     const rawAiText = aiResult && aiResult.response ? aiResult.response : "I'm sorry, I couldn't process that. Please try again.";
     const aiText = (aiService.enhanceVocabulary && typeof aiService.enhanceVocabulary === 'function') ? aiService.enhanceVocabulary(rawAiText) : rawAiText;
@@ -162,5 +169,20 @@ app.use('/api/profiles', userProfileRoutes);
 app.use('/api/materials', learningMaterialRoutes);
 app.use('/api/activity', activityLogRoutes);
 app.use('/api/auth', authRoutes);
+
+app.post('/internal/mobile-metrics', (req, res) => {
+  const payload = req.body || {};
+  const activeConnections = Number(payload.activeConnections) || 0;
+  const quality = Number(payload.quality) || 100;
+  const usageMb = Number(payload.usageMb) || 0;
+  const country = String(payload.country || 'PH');
+  const network = String(payload.network || '4G');
+
+  metrics.updateMobileMetrics({ activeConnections, quality, usageMb, country, network });
+
+  res.status(200).json({ status: 'updated', activeConnections, quality, usageMb, country, network });
+});
+
+app.get('/metrics', metrics.metricsEndpoint);
 
 module.exports = app;

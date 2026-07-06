@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "description": "Frontend for BrainBytes",
   "scripts": {
-    "dev": "node --openssl-legacy-provider ./node_modules/next/dist/bin/next dev",
-    "build": "node --openssl-legacy-provider ./node_modules/next/dist/bin/next build",
+    "dev": "next dev -p 3000",
+    "build": "next build",
     "start": "next start",
     "test": "jest",
     "lint": "next lint"
