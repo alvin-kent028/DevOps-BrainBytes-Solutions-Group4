@@ -27,6 +27,25 @@ const aiResponseHistogram = new client.Histogram({
   buckets: [0.05, 0.1, 0.25, 0.5, 1, 2, 5]
 });
 
+const aiResponseCounter = new client.Counter({
+  name: 'brainbytes_ai_responses_total',
+  help: 'Total number of AI responses generated',
+  labelNames: ['status', 'category']
+});
+
+const activeSessionsGauge = new client.Gauge({
+  name: 'brainbytes_active_sessions',
+  help: 'Current number of active chat sessions',
+  labelNames: ['region']
+});
+
+const sessionDurationHistogram = new client.Histogram({
+  name: 'brainbytes_session_duration_seconds',
+  help: 'Observed session duration distribution in seconds',
+  labelNames: ['channel'],
+  buckets: [10, 30, 60, 120, 300, 600, 1200]
+});
+
 const mobileActiveConnectionsGauge = new client.Gauge({
   name: 'brainbytes_mobile_active_connections',
   help: 'Current number of active mobile user connections',
@@ -73,8 +92,22 @@ function registerRequestMetrics(req, res, next) {
 }
 
 function observeAIResponseTime(durationSeconds) {
-  if (typeof durationSeconds === 'number') {
+  if (Number.isFinite(durationSeconds) && durationSeconds >= 0) {
     aiResponseHistogram.observe(durationSeconds);
+  }
+}
+
+function incrementAIResponseCount(status = 'success', category = 'general') {
+  aiResponseCounter.inc({ status, category });
+}
+
+function setActiveSessions(count = 0, region = 'PH') {
+  activeSessionsGauge.set({ region }, Number.isFinite(count) ? count : 0);
+}
+
+function observeSessionDuration(durationSeconds, channel = 'web') {
+  if (Number.isFinite(durationSeconds) && durationSeconds >= 0) {
+    sessionDurationHistogram.observe({ channel }, durationSeconds);
   }
 }
 
@@ -93,5 +126,8 @@ module.exports = {
   registerRequestMetrics,
   metricsEndpoint,
   observeAIResponseTime,
+  incrementAIResponseCount,
+  setActiveSessions,
+  observeSessionDuration,
   updateMobileMetrics
 };

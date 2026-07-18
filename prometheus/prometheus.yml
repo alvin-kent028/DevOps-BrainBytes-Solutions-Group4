@@ -24,6 +24,9 @@ scrape_configs:
           environment: development
     scrape_interval: 15s
     scrape_timeout: 10s
+    honor_labels: false
+    sample_limit: 25000
+    target_limit: 10000
     relabel_configs:
       - source_labels: [__address__]
         regex: '(.*):5000'
@@ -33,6 +36,11 @@ scrape_configs:
         target_label: prometheus_job
       - source_labels: [__scheme__]
         target_label: scheme
+    metric_relabel_configs:
+      - source_labels: [__name__]
+        regex: 'brainbytes_(.*)'
+        target_label: metric_family
+        replacement: '$1'
 
   - job_name: 'node-exporter'
     static_configs:
@@ -42,6 +50,9 @@ scrape_configs:
           environment: development
     scrape_interval: 30s
     scrape_timeout: 10s
+    honor_labels: false
+    sample_limit: 15000
+    target_limit: 5000
     relabel_configs:
       - source_labels: [__address__]
         regex: '(.*):9100'
@@ -57,6 +68,9 @@ scrape_configs:
           environment: development
     scrape_interval: 60s
     scrape_timeout: 10s
+    honor_labels: false
+    sample_limit: 10000
+    target_limit: 5000
     relabel_configs:
       - source_labels: [__address__]
         regex: '(.*):3000'

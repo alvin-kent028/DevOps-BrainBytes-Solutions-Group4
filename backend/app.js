@@ -26,10 +26,39 @@ const Message = mongoose.model('Message', messageSchema);
 const chatHistory = global.__CHAT_HISTORY__ || new Map();
 global.__CHAT_HISTORY__ = chatHistory;
 
+const activeSessionTimestamps = global.__ACTIVE_SESSIONS__ || new Map();
+global.__ACTIVE_SESSIONS__ = activeSessionTimestamps;
+const sessionStartTimes = global.__SESSION_START_TIMES__ || new Map();
+global.__SESSION_START_TIMES__ = sessionStartTimes;
+const SESSION_TIMEOUT_MS = 10 * 60 * 1000;
+
 function storeChatMessage(sessionId, message) {
   const key = sessionId || 'default';
   const existing = chatHistory.get(key) || [];
   chatHistory.set(key, [...existing, message]);
+}
+
+function touchSession(sessionId) {
+  const key = sessionId || 'default';
+  const now = Date.now();
+  activeSessionTimestamps.set(key, now);
+  if (!sessionStartTimes.has(key)) {
+    sessionStartTimes.set(key, now);
+  }
+  for (const [id, lastSeen] of activeSessionTimestamps.entries()) {
+    if (now - lastSeen > SESSION_TIMEOUT_MS) {
+      activeSessionTimestamps.delete(id);
+      sessionStartTimes.delete(id);
+    }
+  }
+  metrics.setActiveSessions(activeSessionTimestamps.size, 'PH');
+}
+
+function recordSessionDuration(sessionId, channel = 'web') {
+  const key = sessionId || 'default';
+  const start = sessionStartTimes.get(key) || Date.now();
+  const elapsedSeconds = Math.max(0, (Date.now() - start) / 1000);
+  metrics.observeSessionDuration(elapsedSeconds, channel);
 }
 
 app.get('/', (req, res) => {
@@ -107,6 +136,11 @@ app.post('/api/messages', async (req, res) => {
     const elapsed = process.hrtime(startedAt);
     const elapsedSeconds = elapsed[0] + elapsed[1] / 1e9;
     metrics.observeAIResponseTime(elapsedSeconds);
+    const aiStatus = aiResult && aiResult.category !== 'error' ? 'success' : 'error';
+    const aiCategory = aiResult && aiResult.category ? aiResult.category : 'general';
+    metrics.incrementAIResponseCount(aiStatus, aiCategory);
+    recordSessionDuration(req.body.sessionId, req.body.channel || 'web');
+    touchSession(req.body.sessionId);
 
     const rawAiText = aiResult && aiResult.response ? aiResult.response : "I'm sorry, I couldn't process that. Please try again.";
     const aiText = (aiService.enhanceVocabulary && typeof aiService.enhanceVocabulary === 'function') ? aiService.enhanceVocabulary(rawAiText) : rawAiText;
@@ -143,6 +177,9 @@ app.post('/api/chat/send', async (req, res) => {
     }
 
     const sessionId = req.body.sessionId || 'default';
+    touchSession(sessionId);
+    recordSessionDuration(sessionId, req.body.channel || 'web');
+
     const userMessage = { text: message, isUser: true, createdAt: new Date().toISOString(), sessionId };
     const aiMessage = {
       text: `I received: ${message}`,
