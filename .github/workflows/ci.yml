@@ -100,7 +100,7 @@ jobs:
           tags: brainbytes-backend:ci-scan
 
       - name: Scan Backend Image for Vulnerabilities (Trivy)
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: brainbytes-backend:ci-scan
           format: table
@@ -158,7 +158,7 @@ jobs:
           tags: brainbytes-frontend:ci-scan
 
       - name: Scan Frontend Image for Vulnerabilities (Trivy)
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: brainbytes-frontend:ci-scan
           format: table
