@@ -13,8 +13,6 @@ const primaryMongo = process.env.MONGO_URI || 'mongodb://mongo:27017/brainbytes'
 const localFallbackMongo = 'mongodb://127.0.0.1:27017/brainbytes';
 const usesDockerMongoHost = /^mongodb:\/\/mongo(:\d+)?\//.test(primaryMongo);
 
-const { MongoMemoryServer } = require('mongodb-memory-server');
-
 async function connectWithFallback() {
   try {
     await mongoose.connect(primaryMongo);
@@ -41,6 +39,8 @@ async function connectWithFallback() {
 
       try {
         console.warn('Starting in-memory MongoDB for local development...');
+        // Require dynamically only when running locally
+        const { MongoMemoryServer } = require('mongodb-memory-server');
         const mongod = await MongoMemoryServer.create();
         const inMemoryUri = mongod.getUri();
         global.__MONGOD__ = mongod;
