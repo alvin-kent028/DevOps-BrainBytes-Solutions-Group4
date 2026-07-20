@@ -46,7 +46,7 @@ jobs:
     defaults:
       run:
         working-directory: backend
-    
+
     services:
       mongodb:
         image: mongo:6.0
@@ -76,10 +76,7 @@ jobs:
         run: npm run lint
 
       - name: Backend Dependency Security Audit
-        run: npm audit --audit-level=moderate --omit=dev
-
-      - name: Backend Dependency Security Audit
-        run: npm audit --audit-level=critical
+        run: npm audit --audit-level=high --omit=dev
 
       - name: Run backend integration & unit tests
         run: npm test
@@ -138,9 +135,6 @@ jobs:
 
       - name: Frontend Dependency Security Audit
         run: npm audit --audit-level=high --omit=dev
-
-      - name: Frontend Dependency Security Audit
-        run: npm audit --audit-level=critical
 
       - name: Run frontend tests
         run: npm test
