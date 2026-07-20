@@ -19,7 +19,7 @@ jobs:
       contents: read
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
@@ -29,12 +29,12 @@ jobs:
           extra_args: --only-verified
 
       - name: Initialize CodeQL Static Analysis
-        uses: github/codeql-action/init@v3
+        uses: github/codeql-action/init@v4
         with:
           languages: javascript
 
       - name: Perform CodeQL Security Analysis
-        uses: github/codeql-action/analyze@v3
+        uses: github/codeql-action/analyze@v4
 
   # ==========================================
   # BACKEND PIPELINE
@@ -60,12 +60,12 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
-          node-version: 20
+          node-version: 24
           cache: npm
           cache-dependency-path: backend/package-lock.json
 
@@ -88,7 +88,7 @@ jobs:
         uses: docker/setup-buildx-action@v3
 
       - name: Test Build Backend Docker Image
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v7
         with:
           context: ./backend
           file: ./backend/Dockerfile
@@ -101,7 +101,6 @@ jobs:
         with:
           image-ref: brainbytes-backend:ci-scan
           format: table
-          # CRITICAL/HIGH CVEs fail the build; LOW/MEDIUM are reported but don't block.
           severity: CRITICAL,HIGH
           exit-code: '1'
           ignore-unfixed: true
@@ -118,12 +117,12 @@ jobs:
         working-directory: frontend
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
-          node-version: 20
+          node-version: 24
           cache: npm
           cache-dependency-path: frontend/package-lock.json
 
@@ -143,7 +142,7 @@ jobs:
         uses: docker/setup-buildx-action@v3
 
       - name: Test Build Frontend Docker Image
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v7
         with:
           context: ./frontend
           file: ./frontend/Dockerfile
@@ -172,7 +171,7 @@ jobs:
        RAILWAY_TOKEN: '${{ secrets.RAILWAY_TOKEN }}'
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Install Cloud Deployment CLI
         run: npm install -g @railway/cli
@@ -185,14 +184,6 @@ jobs:
         run: railway up --service "brainbytes-frontend"
         working-directory: ./frontend
 
-      # ------------------------------------------------------------------
-      # Post-deploy verification. Railway already refuses to route traffic
-      # to a deployment whose healthcheckPath (/health, see railway.json)
-      # never returns 200 — but that check happens inside Railway, silently.
-      # This step makes the result visible in CI: if the new deployment
-      # never reports healthy, the job fails loudly and the team knows to
-      # roll back instead of finding out from a Discord message later.
-      # ------------------------------------------------------------------
       - name: Verify Backend Deployment Health
         run: |
           echo "Polling backend health endpoint..."
