@@ -1,12 +1,14 @@
 # ---- Stage 1: install dependencies ----
 FROM node:20-alpine AS deps
 WORKDIR /app
+RUN apk update && apk upgrade --no-cache
 COPY package*.json ./
 RUN npm ci --legacy-peer-deps
 
 # ---- Stage 2: build the Next.js app ----
 FROM node:20-alpine AS builder
 WORKDIR /app
+RUN apk update && apk upgrade --no-cache
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 RUN mkdir -p public
@@ -22,6 +24,7 @@ RUN npm run build
 # ---- Stage 3: minimal runtime image ----
 FROM node:20-alpine AS runner
 WORKDIR /app
+RUN apk update && apk upgrade --no-cache
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 
