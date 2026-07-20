@@ -76,7 +76,7 @@ jobs:
         run: npm run lint
 
       - name: Backend Dependency Security Audit
-        run: npm audit --audit-level=high --omit=dev
+        run: npm audit --audit-level=moderate --omit=dev
 
       - name: Backend Dependency Security Audit
         run: npm audit --audit-level=critical
