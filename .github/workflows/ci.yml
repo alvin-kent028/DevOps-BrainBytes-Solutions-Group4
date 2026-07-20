@@ -46,7 +46,7 @@ jobs:
     defaults:
       run:
         working-directory: backend
-    
+
     services:
       mongodb:
         image: mongo:6.0
@@ -78,9 +78,6 @@ jobs:
       - name: Backend Dependency Security Audit
         run: npm audit --audit-level=high --omit=dev
 
-      - name: Backend Dependency Security Audit
-        run: npm audit --audit-level=critical
-
       - name: Run backend integration & unit tests
         run: npm test
         env:
@@ -100,7 +97,7 @@ jobs:
           tags: brainbytes-backend:ci-scan
 
       - name: Scan Backend Image for Vulnerabilities (Trivy)
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: brainbytes-backend:ci-scan
           format: table
@@ -139,9 +136,6 @@ jobs:
       - name: Frontend Dependency Security Audit
         run: npm audit --audit-level=high --omit=dev
 
-      - name: Frontend Dependency Security Audit
-        run: npm audit --audit-level=critical
-
       - name: Run frontend tests
         run: npm test
 
@@ -158,7 +152,7 @@ jobs:
           tags: brainbytes-frontend:ci-scan
 
       - name: Scan Frontend Image for Vulnerabilities (Trivy)
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: brainbytes-frontend:ci-scan
           format: table

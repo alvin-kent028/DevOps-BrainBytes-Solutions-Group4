@@ -3,12 +3,14 @@
 # ---- Stage 1: install dependencies ----
 FROM node:20-alpine AS deps
 WORKDIR /usr/src/app
+RUN apk update && apk upgrade --no-cache
 COPY package*.json ./
 RUN npm ci --omit=dev --legacy-peer-deps
 
 # ---- Stage 2: runtime image ----
 FROM node:20-alpine AS runner
 WORKDIR /usr/src/app
+RUN apk update && apk upgrade --no-cache
 ENV NODE_ENV=production
 
 # Run as a non-root user instead of the default root inside the container
