@@ -3,7 +3,7 @@ FROM node:20-alpine AS deps
 WORKDIR /app
 RUN apk update && apk upgrade --no-cache
 COPY package*.json ./
-RUN npm ci --legacy-peer-deps
+RUN npm install --legacy-peer-deps
 
 # ---- Stage 2: build the Next.js app ----
 FROM node:20-alpine AS builder

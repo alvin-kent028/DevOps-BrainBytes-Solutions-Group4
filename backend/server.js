@@ -6,14 +6,36 @@ const aiService = require('./aiService');
 const app = require('./app');
 const PORT = process.env.PORT || 5000;
 
+// Initialize CORS middleware
+// Allows your Railway Frontend domain and local development URLs
+const allowedOrigins = [
+  'https://brainbytes-ai-tutor1.up.railway.app',
+  process.env.FRONTEND_URL,
+  'http://localhost:3000',
+  'http://localhost:5173'
+].filter(Boolean); // Cleans out undefined values if FRONTEND_URL isn't set
+
+app.use(cors({
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps, curl, or Postman)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.indexOf(origin) !== -1 || allowedOrigins.includes('*')) {
+      callback(null, true);
+    } else {
+      callback(null, false); // Block origin cleanly
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
 // Initialize AI model
 aiService.initializeAI();
 
 const primaryMongo = process.env.MONGO_URI || 'mongodb://mongo:27017/brainbytes';
 const localFallbackMongo = 'mongodb://127.0.0.1:27017/brainbytes';
 const usesDockerMongoHost = /^mongodb:\/\/mongo(:\d+)?\//.test(primaryMongo);
-
-const { MongoMemoryServer } = require('mongodb-memory-server');
 
 async function connectWithFallback() {
   try {
@@ -24,10 +46,10 @@ async function connectWithFallback() {
 
     if (process.env.NODE_ENV === 'production' && !usesDockerMongoHost) {
       console.error('Failed to connect to MongoDB (MONGO_URI) in production. Exiting.');
-      return;
+      process.exit(1);
     }
 
-    const fallbackTarget = usesDockerMongoHost ? localFallbackMongo : localFallbackMongo;
+    const fallbackTarget = localFallbackMongo;
     try {
       await mongoose.connect(fallbackTarget);
       console.log('Connected to MongoDB (fallback):', fallbackTarget);
@@ -41,6 +63,8 @@ async function connectWithFallback() {
 
       try {
         console.warn('Starting in-memory MongoDB for local development...');
+        // Require dynamically only when running locally
+        const { MongoMemoryServer } = require('mongodb-memory-server');
         const mongod = await MongoMemoryServer.create();
         const inMemoryUri = mongod.getUri();
         global.__MONGOD__ = mongod;
