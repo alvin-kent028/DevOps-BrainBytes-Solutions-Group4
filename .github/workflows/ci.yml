@@ -179,11 +179,11 @@ jobs:
         run: npm install -g @railway/cli
 
       - name: Deploy Backend Service to Cloud
-        run: railway up --service "brainbytes-backend"
+        run: railway up --service "Backend"
         working-directory: ./backend
 
       - name: Deploy Frontend Service to Cloud
-        run: railway up --service "brainbytes-frontend"
+        run: railway up --service "Frontend"
         working-directory: ./frontend
 
       - name: Verify Backend Deployment Health
