@@ -47,7 +47,8 @@ async function launch() {
   const backendPort = 3000;
   const backendAvailable = await isPortAvailable(backendPort);
   if (backendAvailable) {
-    backendProc = startProcess('backend', 'node', ['backend/server.js']);
+    const backendEnv = Object.assign({}, process.env, { PORT: String(backendPort) });
+    backendProc = startProcess('backend', 'node', ['backend/server.js'], { env: backendEnv });
     // wait for ready or timeout
     const readyRegex = /Server running on port\s*(\d+)/i;
     let ready = false;
