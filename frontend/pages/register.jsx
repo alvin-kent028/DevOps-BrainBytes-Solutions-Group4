@@ -23,19 +23,20 @@ export default function Register() {
     }
 
     setLoading(true);
-    try {
-      const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5000';
+try {
+  // Uses environment variable in production, falls back to local backend
+  const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5000';
 
-      const response = await fetch(`${API_BASE}/api/auth/register`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          username: trimmedUser, 
-          name: trimmedUser, // Backing up both property names to prevent "Name required" errors
-          email: trimmedEmail, 
-          password: trimmedPassword 
-        }),
-      });
+  const response = await fetch(`${API_BASE}/api/auth/register`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ 
+      username: trimmedUser, 
+      name: trimmedUser, // Backing up both property names to prevent "Name required" errors
+      email: trimmedEmail, 
+      password: trimmedPassword 
+    }),
+  });
 
       const data = await response.json();
 
