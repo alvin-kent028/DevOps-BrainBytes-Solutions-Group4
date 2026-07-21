@@ -1,0 +1,8 @@
+{
+  "deploy": {
+    "healthcheckPath": "/api/health",
+    "healthcheckTimeout": 60,
+    "healthcheckInterval": 10,
+    "healthcheckRetries": 5
+  }
+}
