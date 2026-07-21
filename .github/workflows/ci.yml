@@ -178,14 +178,7 @@ jobs:
       - name: Install Cloud Deployment CLI
         run: npm install -g @railway/cli
 
-      - name: Deploy Backend Service to Cloud
-        run: railway up --service "Backend" backend
-        working-directory: ./backend
-
-      - name: Deploy Frontend Service to Cloud
-        run: railway up --service "Frontend" frontend
-        working-directory: ./frontend
-
+      
       - name: Verify Backend Deployment Health
         run: |
           echo "Polling backend health endpoint..."
