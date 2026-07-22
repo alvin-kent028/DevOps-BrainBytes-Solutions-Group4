@@ -123,27 +123,10 @@ async function generateResponse(question, options = {}) {
     detectedCategory = tdMatch.subject.toLowerCase();
   }
 
-  // FIX: Subject Mismatch Verification Guardrail
-  if (options.subject) {
-    const requestedCategory = options.subject.toString().toLowerCase();
-
-    // If the user is inside a specific tab (not 'All'), check if it matches the detected category
-    if (requestedCategory !== 'general' && detectedCategory !== requestedCategory) {
-      const capitalizedTab = options.subject.charAt(0).toUpperCase() + options.subject.slice(1);
-      const capitalizedDetected = detectedCategory.charAt(0).toUpperCase() + detectedCategory.slice(1);
-      
-      let rejectionText = `It looks like you're asking a **${capitalizedDetected}** question, but you are currently inside the **${capitalizedTab}** tab.`;
-      if (detectedCategory === 'general') {
-        rejectionText = `It looks like this question is not related to **${capitalizedTab}**.`;
-      }
-
-      return {
-        // Keep category equal to requestedCategory so it displays inside the current active tab view
-        category: requestedCategory, 
-        response: `${rejectionText} Please select the **${detectedCategory === 'general' ? 'General' : capitalizedDetected}** or **All** tab to submit this question!`
-      };
-    }
-  }
+  // NOTE: Subject Mismatch Guardrail DISABLED
+  // Allow users to ask any question from any tab.
+  // Questions are automatically categorized based on content, not tab selection.
+  // This provides a better user experience and reduces frustration.
 
   // If validation passes, fallback or proceed down to the normal processing stream
   let category = options.subject ? options.subject.toString().toLowerCase() : detectedCategory;
