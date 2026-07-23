@@ -121,7 +121,9 @@ verification step.
 - ESLint screenshot: https://drive.google.com/drive/folders/1LgQJZU1CuJ98P7AYoTirHjT6RahUpqxT?usp=drive_link 
 
 ## Resources
-
+- Grafana: http://localhost:3001/ 
+- Prometheus: http://prometheus:9090
+- Cloud Deployment in Railway: https://brainbytes-ai-tutor1.up.railway.app/ 
 - Video: https://drive.google.com/file/d/17vgHT4nCi5vfZlhChjQZLzOkY4DMPDzc/view?usp=drivesdk
 - External documentation: https://docs.google.com/document/d/12nML8XkBnVguc78j4sLNAx57mDtpozM-NP1UUZrumk8/edit?usp=drivesdk
 
